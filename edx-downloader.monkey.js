@@ -1,9 +1,13 @@
 // ==UserScript==
-// @name         Course Downloader
-// @namespace    http://tampermonkey.net/
-// @version      0.1
-// @description  Download edX course
-// @author       You
+// @name         edX Downloader
+// @name:zh-CN   edX网课下载器
+// @name:zh-TW	 edX網課下載器
+// @name:ja		 edXダウンローダー
+// @namespace    https://github.com/jks-liu/edx-downloader.monkey.js
+// @version      1.0.0
+// @description  Download edX course mp4 and srt in one click
+// @description:zh-CN  一键下载edX网课视频和字幕
+// @author       Jks Liu (https://github.com/jks-liu)
 // @match        https://edx.org/*
 // @match        https://www.edx.org/*
 // @match        https://learning.edx.org/*
