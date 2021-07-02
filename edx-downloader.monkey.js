@@ -5,7 +5,7 @@
 // @name:ja      edXダウンローダー
 // @namespace    https://github.com/jks-liu/edx-downloader.monkey.js
 // @supportURL   https://github.com/jks-liu/edx-downloader.monkey.js
-// @version      2.0.0
+// @version      2.0.1
 // @description  Download edX course mp4 and srt in one click, and save them as same file name (except the file suffix). <https://github.com/jks-liu/edx-downloader.monkey.js>
 // @description:zh-CN  一键下载edX网课视频和字幕，并保存为相同的文件名（除了文件后缀）。<https://github.com/jks-liu/edx-downloader.monkey.js>
 // @description:zh-TW  一鍵下載edX網課視頻和字幕，並保存爲相同的文件名（除了文件後綴）。<https://github.com/jks-liu/edx-downloader.monkey.js>
@@ -55,18 +55,35 @@ function jks_learning_edu_org() {
     const $$ = (...args) => Array.from(document.querySelectorAll(...args));
 
     var checkExist = setInterval(function() {
-        if ($$("ol.list-unstyled a").length && $$("div.sequence-navigation-tabs > button").length) {     
-            let course_name = $$("ol.list-unstyled a")[1].text;
-            let paragraph_name = $$("ol.list-unstyled a")[2].text;
+        let all_titles = $$("ol.list-unstyled a");
+        let all_buttons = $$("div.sequence-navigation-tabs > button");
+        if (all_titles.length && all_buttons.length) {
+            clearInterval(checkExist);
+
+            /// Get course meta data
+            let course_name = all_titles[1].text;
+            let paragraph_name = all_titles[2].text;
         
-            let all_sections = $$("div.sequence-navigation-tabs > button").map(button=>button.title);
-            let active_section_index = $$("div.sequence-navigation-tabs > button").findIndex(button=>button.classList.contains("active"));
+            let all_sections = all_buttons.map(button=>button.title);
+            let active_section_index = all_buttons.findIndex(button=>button.classList.contains("active"));
             let active_section = all_sections[active_section_index];
         
             console.log("jks edx names", course_name, paragraph_name, active_section);
-            GM_setValue("names", [course_name, paragraph_name, active_section, active_section_index])
+            GM_setValue("names", [course_name, paragraph_name, active_section, active_section_index]);
 
-            clearInterval(checkExist);
+            /// Register action to detect meta data change
+            let class_context = $$("div.sequence-navigation-tabs")[0];
+            // https://stackoverflow.com/questions/38861601/how-to-only-trigger-parent-click-event-when-a-child-is-clicked/38861760
+            class_context.addEventListener('click', function(event) {
+                let button = event.target;
+                while (button.nodeName != "BUTTON") {
+                    button = button.parentElement;
+                }
+
+                let new_section = button.title;
+                let new_section_index = all_buttons.findIndex(b => b===button);
+                GM_setValue("names", [course_name, paragraph_name, new_section, new_section_index]);
+            }, true);
         }
      }, 100); // check every 100ms
 }
